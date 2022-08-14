@@ -14,8 +14,8 @@ type Store[K comparable] struct {
 
 // Entry represents a pair of key and value that can be retrieved from Store
 type Entry[K comparable, V any] struct {
-	key   K
-	value V
+	Key   K
+	Value V
 }
 
 // Get returns a value stored in the store if it exists, or zero value for the type and false
@@ -237,8 +237,8 @@ func Entries[V any, K comparable](store *Store[K]) []Entry[K, V] {
 	for key, rawValue := range store.data {
 		if value, ok := rawValue.(V); ok {
 			entries = append(entries, Entry[K, V]{
-				key:   key,
-				value: value,
+				Key:   key,
+				Value: value,
 			})
 		}
 	}
@@ -254,8 +254,8 @@ func EntriesRaw[K comparable](store *Store[K]) []Entry[K, any] {
 	entries := make([]Entry[K, any], 0, len(store.data))
 	for key, rawValue := range store.data {
 		entries = append(entries, Entry[K, any]{
-			key:   key,
-			value: rawValue,
+			Key:   key,
+			Value: rawValue,
 		})
 	}
 
