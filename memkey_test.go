@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGet(t *testing.T) {
+func TestGetAndSet(t *testing.T) {
 	s := &Store[int]{}
 
 	t.Run("int_not_found", func(t *testing.T) {
@@ -52,5 +52,42 @@ func TestGet(t *testing.T) {
 		value, ok := Get[testInterface](s, k)
 		assert.True(t, ok)
 		assert.Equal(t, testInterfaceImpl{}, value)
+	})
+
+	t.Run("int_not_found_by_type", func(t *testing.T) {
+		k := testKey(t)
+		Set(s, k, 1.0)
+		value, ok := Get[int](s, k)
+		assert.False(t, ok)
+		assert.Zero(t, value)
+		assert.IsType(t, 0, value)
+	})
+
+	t.Run("redefine", func(t *testing.T) {
+		k := testKey(t)
+
+		Set(s, k, 1)
+		value, ok := Get[int](s, k)
+		assert.True(t, ok)
+		assert.Equal(t, 1, value)
+
+		Set(s, k, 2)
+		value, ok = Get[int](s, k)
+		assert.True(t, ok)
+		assert.Equal(t, 2, value)
+	})
+
+	t.Run("redefine_type", func(t *testing.T) {
+		k := testKey(t)
+
+		Set(s, k, 1)
+		valueInt, ok := Get[int](s, k)
+		assert.True(t, ok)
+		assert.Equal(t, 1, valueInt)
+
+		Set(s, k, 2.0)
+		valueFloat, ok := Get[float64](s, k)
+		assert.True(t, ok)
+		assert.Equal(t, 2.0, valueFloat)
 	})
 }
