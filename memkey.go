@@ -104,6 +104,14 @@ func Delete[V any, K comparable](store *Store[K], key K) {
 	delete(store.data, key)
 }
 
+// DeleteRaw deletes value from the store, if not found this is no-op
+func DeleteRaw[K comparable](store *Store[K], key K) {
+	store.lock.Lock()
+	defer store.lock.Unlock()
+
+	delete(store.data, key)
+}
+
 // DeleteOk deletes value from the store if it exists with a specified type and returns true, if not found returns false
 func DeleteOk[V any, K comparable](store *Store[K], key K) bool {
 	store.lock.Lock()
@@ -121,14 +129,6 @@ func DeleteOk[V any, K comparable](store *Store[K], key K) bool {
 
 	delete(store.data, key)
 	return true
-}
-
-// DeleteRaw deletes value from the store, if not found this is no-op
-func DeleteRaw[K comparable](store *Store[K], key K) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
-
-	delete(store.data, key)
 }
 
 // DeleteRawOk deletes value from the store and returns true or if not found reruns false
@@ -263,7 +263,7 @@ func EntriesRaw[K comparable](store *Store[K]) []Entry[K, any] {
 }
 
 // ForEach goes in loop through all values of a specified type and calls f with a key and value
-// Warning: Not thread-safe
+// Warning: May be not thread-safe depending on your usage
 func ForEach[V any, K comparable](store *Store[K], f func(key K, value V)) {
 	for key, rawValue := range store.data {
 		if value, ok := rawValue.(V); ok {
@@ -273,7 +273,7 @@ func ForEach[V any, K comparable](store *Store[K], f func(key K, value V)) {
 }
 
 // ForEachRaw goes in loop through all values and calls f with a key and value
-// Warning: Not thread-safe
+// Warning: May be not thread-safe depending on your usage
 func ForEachRaw[K comparable](store *Store[K], f func(key K, value any)) {
 	for key, rawValue := range store.data {
 		f(key, rawValue)
