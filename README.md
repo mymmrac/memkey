@@ -35,16 +35,18 @@ s := &memkey.Store[comparable]{}
 All methods are type-safe and thread-safe, there are also type-unsafe variant of all methods (like `GetRaw`, `KeysRaw`,
 etc.).
 
-- `Get`
-- `Set`
-- `Has`
-- `Delete`
-- `DeleteOk`
-- `Len`
-- `Keys`
-- `Values`
-- `Entries`
-- `ForEach`
+| Method     | Description                             |
+|------------|-----------------------------------------|
+| `Get`      | Get value                               |
+| `Set`      | Set value                               |
+| `Has`      | Check if value exists                   |
+| `Delete`   | Delete value                            |
+| `DeleteOk` | Delete value and return true if deleted |
+| `Len`      | Number of elements stored               |
+| `Keys`     | Get keys                                |
+| `Values`   | Get values                              |
+| `Entries`  | Get all key-value pairs                 |
+| `ForEach`  | Iterate over key-value pairs            |
 
 ## :jigsaw: Usage
 
@@ -64,7 +66,7 @@ n, ok := Get[float64](s, 3)
 // Here `n` will be float64
 
 found := Has[uint](s, 2)
-// Here `found will be false, since value with key `2` is `string` and not an `uint`
+// Here `found` will be `false`, since value with key `2` is `string` and not an `uint`
 
 keys := KeysRaw(s)
 // Here `keys` will be a slice of `1`, `2` and `3` in non deterministic order, 
