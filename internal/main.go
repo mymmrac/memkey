@@ -9,14 +9,14 @@ import (
 func main() {
 	s := &memkey.Store[int]{}
 
-	fmt.Println(memkey.Has[string](s, 1), memkey.HasKey(s, 1))
+	fmt.Println(memkey.Has[string](s, 1), memkey.HasRaw(s, 1))
 
 	text, ok := memkey.Get[string](s, 1)
 	fmt.Println(text, ok)
 
 	memkey.Set(s, 1, "hmm")
 
-	fmt.Println(memkey.HasKey(s, 1), memkey.Has[string](s, 1), memkey.Has[int](s, 1))
+	fmt.Println(memkey.HasRaw(s, 1), memkey.Has[string](s, 1), memkey.Has[int](s, 1))
 
 	text, ok = memkey.Get[string](s, 1)
 	fmt.Println(text, ok)
@@ -36,6 +36,6 @@ func main() {
 
 	fmt.Println("====")
 
-	fmt.Println(memkey.Keys(s), memkey.Values(s))
-	fmt.Println(memkey.KeysOf[int](s), memkey.ValuesOf[int](s))
+	fmt.Println(memkey.KeysRaw(s), memkey.ValuesRaw(s))
+	fmt.Println(memkey.Keys[int](s), memkey.Values[int](s))
 }

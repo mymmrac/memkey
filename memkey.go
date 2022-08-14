@@ -77,8 +77,8 @@ func Has[V any, K comparable](store *Store[K], key K) bool {
 	return ok
 }
 
-// HasKey returns true if value with the specified key exist in the store with any type
-func HasKey[K comparable](store *Store[K], key K) bool {
+// HasRaw returns a true if value with the specified key exists in the store with any type
+func HasRaw[K comparable](store *Store[K], key K) bool {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
@@ -153,21 +153,8 @@ func Len[K comparable](store *Store[K]) int {
 	return len(store.data)
 }
 
-// Keys returns keys of all values that are stored
-func Keys[K comparable](store *Store[K]) []K {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
-
-	keys := make([]K, 0, len(store.data))
-	for key := range store.data {
-		keys = append(keys, key)
-	}
-
-	return keys
-}
-
-// KeysOf returns keys of all values with a specified type that are stored
-func KeysOf[V any, K comparable](store *Store[K]) []K {
+// Keys returns keys of all values with a specified type that are stored
+func Keys[V any, K comparable](store *Store[K]) []K {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
@@ -183,21 +170,21 @@ func KeysOf[V any, K comparable](store *Store[K]) []K {
 	return keys
 }
 
-// Values returns all values that are stored
-func Values[K comparable](store *Store[K]) []any {
+// KeysRaw returns keys of all values that are stored
+func KeysRaw[K comparable](store *Store[K]) []K {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
-	values := make([]any, 0, len(store.data))
-	for _, rawValue := range store.data {
-		values = append(values, rawValue)
+	keys := make([]K, 0, len(store.data))
+	for key := range store.data {
+		keys = append(keys, key)
 	}
 
-	return values
+	return keys
 }
 
-// ValuesOf returns all values with a specified that are stored
-func ValuesOf[V any, K comparable](store *Store[K]) []V {
+// Values returns all values with a specified type that are stored
+func Values[V any, K comparable](store *Store[K]) []V {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
@@ -211,24 +198,21 @@ func ValuesOf[V any, K comparable](store *Store[K]) []V {
 	return values
 }
 
-// Entries returns entries (key-value pairs) that are stored
-func Entries[K comparable](store *Store[K]) []Entry[K, any] {
+// ValuesRaw returns all values that are stored
+func ValuesRaw[K comparable](store *Store[K]) []any {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
-	entries := make([]Entry[K, any], 0, len(store.data))
-	for key, rawValue := range store.data {
-		entries = append(entries, Entry[K, any]{
-			key:   key,
-			value: rawValue,
-		})
+	values := make([]any, 0, len(store.data))
+	for _, rawValue := range store.data {
+		values = append(values, rawValue)
 	}
 
-	return entries
+	return values
 }
 
-// EntriesOf returns entries (key-value pairs) where value is of a specified type that are stored
-func EntriesOf[V any, K comparable](store *Store[K]) []Entry[K, V] {
+// Entries returns entries (key-value pairs) where value is of a specified type that are stored
+func Entries[V any, K comparable](store *Store[K]) []Entry[K, V] {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
@@ -245,20 +229,36 @@ func EntriesOf[V any, K comparable](store *Store[K]) []Entry[K, V] {
 	return entries
 }
 
-// ForEach goes in loop through all values and calls f with a key and value
-// Warning: Not thread-safe
-func ForEach[K comparable](store *Store[K], f func(key K, value any)) {
+// EntriesRaw returns entries (key-value pairs) that are stored
+func EntriesRaw[K comparable](store *Store[K]) []Entry[K, any] {
+	store.lock.RLock()
+	defer store.lock.RUnlock()
+
+	entries := make([]Entry[K, any], 0, len(store.data))
 	for key, rawValue := range store.data {
-		f(key, rawValue)
+		entries = append(entries, Entry[K, any]{
+			key:   key,
+			value: rawValue,
+		})
 	}
+
+	return entries
 }
 
-// ForEachOf goes in loop through all values of a specified type and calls f with a key and value
+// ForEach goes in loop through all values of a specified type and calls f with a key and value
 // Warning: Not thread-safe
-func ForEachOf[V any, K comparable](store *Store[K], f func(key K, value V)) {
+func ForEach[V any, K comparable](store *Store[K], f func(key K, value V)) {
 	for key, rawValue := range store.data {
 		if value, ok := rawValue.(V); ok {
 			f(key, value)
 		}
+	}
+}
+
+// ForEachRaw goes in loop through all values and calls f with a key and value
+// Warning: Not thread-safe
+func ForEachRaw[K comparable](store *Store[K], f func(key K, value any)) {
+	for key, rawValue := range store.data {
+		f(key, rawValue)
 	}
 }
