@@ -145,8 +145,25 @@ func DeleteRawOk[K comparable](store *Store[K], key K) bool {
 	return true
 }
 
-// Len returns number of elements stored
-func Len[K comparable](store *Store[K]) int {
+// Len returns number of values with a specified type that are stored
+func Len[V any, K comparable](store *Store[K]) int {
+	store.lock.RLock()
+	defer store.lock.RUnlock()
+
+	count := 0
+	for _, rawValue := range store.data {
+		if _, ok := rawValue.(V); !ok {
+			continue
+		}
+
+		count++
+	}
+
+	return count
+}
+
+// LenRaw returns number of values that are stored
+func LenRaw[K comparable](store *Store[K]) int {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
 
