@@ -36,12 +36,12 @@ func Get[V any, K comparable](store *Store[K], key K) (V, bool) {
 	return value, true
 }
 
-// GetRaw returns raw value stored in the store if it exists, or nil and false
-func GetRaw[K comparable](store *Store[K], key K) (any, bool) {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
+// Get returns raw value stored in the store if it exists, or nil and false
+func (s *Store[K]) Get(key K) (any, bool) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
-	rawValue, ok := store.data[key]
+	rawValue, ok := s.data[key]
 	if !ok {
 		return nil, false
 	}
@@ -63,6 +63,20 @@ func Set[V any, K comparable](store *Store[K], key K, value V) {
 	store.data[key] = value
 }
 
+// Set stores value in the store
+func (s *Store[K]) Set(key K, value any) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.init.Do(func() {
+		if s.data == nil {
+			s.data = make(map[K]any)
+		}
+	})
+
+	s.data[key] = value
+}
+
 // Has returns true if value with the specified key and type exist in the store
 func Has[V any, K comparable](store *Store[K], key K) bool {
 	store.lock.RLock()
@@ -77,12 +91,12 @@ func Has[V any, K comparable](store *Store[K], key K) bool {
 	return ok
 }
 
-// HasRaw returns a true if value with the specified key exists in the store with any type
-func HasRaw[K comparable](store *Store[K], key K) bool {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
+// Has returns a true if value with the specified key exists in the store with any type
+func (s *Store[K]) Has(key K) bool {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
-	_, ok := store.data[key]
+	_, ok := s.data[key]
 	return ok
 }
 
@@ -105,17 +119,17 @@ func Delete[V any, K comparable](store *Store[K], key K) bool {
 	return true
 }
 
-// DeleteRaw deletes value from the store and returns true or if not found reruns false
-func DeleteRaw[K comparable](store *Store[K], key K) bool {
-	store.lock.Lock()
-	defer store.lock.Unlock()
+// Delete deletes value from the store and returns true or if not found reruns false
+func (s *Store[K]) Delete(key K) bool {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
-	_, ok := store.data[key]
+	_, ok := s.data[key]
 	if !ok {
 		return false
 	}
 
-	delete(store.data, key)
+	delete(s.data, key)
 	return true
 }
 
@@ -136,12 +150,12 @@ func Len[V any, K comparable](store *Store[K]) int {
 	return count
 }
 
-// LenRaw returns number of values that are stored
-func LenRaw[K comparable](store *Store[K]) int {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
+// Len returns number of values that are stored
+func (s *Store[K]) Len() int {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
-	return len(store.data)
+	return len(s.data)
 }
 
 // Keys returns keys of all values with a specified type that are stored
@@ -161,13 +175,13 @@ func Keys[V any, K comparable](store *Store[K]) []K {
 	return keys
 }
 
-// KeysRaw returns keys of all values that are stored
-func KeysRaw[K comparable](store *Store[K]) []K {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
+// Keys returns keys of all values that are stored
+func (s *Store[K]) Keys() []K {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
-	keys := make([]K, 0, len(store.data))
-	for key := range store.data {
+	keys := make([]K, 0, len(s.data))
+	for key := range s.data {
 		keys = append(keys, key)
 	}
 
@@ -189,13 +203,13 @@ func Values[V any, K comparable](store *Store[K]) []V {
 	return values
 }
 
-// ValuesRaw returns all values that are stored
-func ValuesRaw[K comparable](store *Store[K]) []any {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
+// Values returns all values that are stored
+func (s *Store[K]) Values() []any {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
-	values := make([]any, 0, len(store.data))
-	for _, rawValue := range store.data {
+	values := make([]any, 0, len(s.data))
+	for _, rawValue := range s.data {
 		values = append(values, rawValue)
 	}
 
@@ -220,13 +234,13 @@ func Entries[V any, K comparable](store *Store[K]) []Entry[K, V] {
 	return entries
 }
 
-// EntriesRaw returns entries (key-value pairs) that are stored
-func EntriesRaw[K comparable](store *Store[K]) []Entry[K, any] {
-	store.lock.RLock()
-	defer store.lock.RUnlock()
+// Entries returns entries (key-value pairs) that are stored
+func (s *Store[K]) Entries() []Entry[K, any] {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
-	entries := make([]Entry[K, any], 0, len(store.data))
-	for key, rawValue := range store.data {
+	entries := make([]Entry[K, any], 0, len(s.data))
+	for key, rawValue := range s.data {
 		entries = append(entries, Entry[K, any]{
 			Key:   key,
 			Value: rawValue,
@@ -246,10 +260,10 @@ func ForEach[V any, K comparable](store *Store[K], f func(key K, value V)) {
 	}
 }
 
-// ForEachRaw goes in loop through all values and calls f with a key and value
+// ForEach goes in loop through all values and calls f with a key and value
 // Warning: May be not thread-safe depending on your usage
-func ForEachRaw[K comparable](store *Store[K], f func(key K, value any)) {
-	for key, rawValue := range store.data {
+func (s *Store[K]) ForEach(f func(key K, value any)) {
+	for key, rawValue := range s.data {
 		f(key, rawValue)
 	}
 }

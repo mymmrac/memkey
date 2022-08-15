@@ -32,8 +32,8 @@ s := &memkey.Store[comparable]{}
 
 ## :kite: Features
 
-All methods are type-safe and thread-safe, there are also type-unsafe variant of all methods (like `GetRaw`, `KeysRaw`,
-etc.).
+All functions are type-safe and thread-safe, there is also type-unsafe variant of all functions (just use same methods
+of [`Store`](https://pkg.go.dev/github.com/mymmrac/memkey#Store) struct).
 
 | Method                                                            | Description                             |
 |-------------------------------------------------------------------|-----------------------------------------|
