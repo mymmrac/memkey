@@ -55,24 +55,24 @@ of [`Store`](https://pkg.go.dev/github.com/mymmrac/memkey#Store) struct).
 ```go
 s := &memkey.Store[int]{}
 
-Set(s, 1, "mem")
-Set(s, 2, "key")
-Set(s, 3, 42.0)
+memkey.Set(s, 1, "mem")
+memkey.Set(s, 2, "key")
+memkey.Set(s, 3, 42.0)
 
-m, ok := Get[string](s, 1)
-k, ok := Get[string](s, 2)
+m, ok := memkey.Get[string](s, 1)
+k, ok := memkey.Get[string](s, 2)
 // Here `m` & `k` will be of type string and have zero value if not found, 
 // `ok` will indicate if value was found
 
-n, ok := Get[float64](s, 3)
+n, ok := memkey.Get[float64](s, 3)
 // Here `n` will be float64
 
-found := Has[uint](s, 2)
+found := memkey.Has[uint](s, 2)
 // Here `found` will be `false`, since value with key `2` is `string` and not an `uint`
 
-keys := KeysRaw(s)
-// Here `keys` will be a slice of `1`, `2` and `3` in non deterministic order, 
-// `..Raw` methods will ignore type of values
+keys := s.Keys()
+// Here `keys` will be a slice of `1`, `2` and `3` in non-deterministic order, 
+// Methods called on `Store` will ignore the type of values
 ```
 
 ## :closed_lock_with_key: License
