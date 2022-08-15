@@ -27,4 +27,6 @@ cover: test ## Run tests & show coverage
 race: ## Run tests with race flag
 	go test -race -count=1 ./...
 
-.PHONY: help lint lint-install lint-list
+pre-commit: test lint ## Run pre commit checks
+
+.PHONY: help lint lint-install lint-list test cover race pre-commit
