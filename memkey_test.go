@@ -112,6 +112,36 @@ func TestStore_GetAndSet(t *testing.T) {
 	})
 }
 
+func TestMustGet(t *testing.T) {
+	s := &Store[int]{}
+
+	t.Run("found", func(t *testing.T) {
+		k := testKey(t)
+		Set(s, k, 1)
+		assert.Equal(t, 1, MustGet[int](s, k))
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		Set(s, testKey(t), 1)
+		assert.Equal(t, 0, MustGet[int](s, -1))
+	})
+}
+
+func TestStore_MustGet(t *testing.T) {
+	s := &Store[int]{}
+
+	t.Run("found", func(t *testing.T) {
+		k := testKey(t)
+		s.Set(k, 1)
+		assert.Equal(t, 1, s.MustGet(k))
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		s.Set(testKey(t), 1)
+		assert.Equal(t, nil, s.MustGet(-1))
+	})
+}
+
 func TestType(t *testing.T) {
 	s := &Store[int]{}
 
@@ -137,16 +167,46 @@ func TestStore_Type(t *testing.T) {
 	t.Run("found", func(t *testing.T) {
 		k := testKey(t)
 		Set(s, k, 1)
-		kind, ok := s.Type(k)
+		typ, ok := s.Type(k)
 		assert.True(t, ok)
-		assert.Equal(t, "int", kind)
+		assert.Equal(t, "int", typ)
 	})
 
 	t.Run("not_found", func(t *testing.T) {
 		Set(s, testKey(t), 1)
-		kind, ok := s.Type(-1)
+		typ, ok := s.Type(-1)
 		assert.False(t, ok)
-		assert.Equal(t, "", kind)
+		assert.Equal(t, "", typ)
+	})
+}
+
+func TestMustType(t *testing.T) {
+	s := &Store[int]{}
+
+	t.Run("found", func(t *testing.T) {
+		k := testKey(t)
+		Set(s, k, 1)
+		assert.Equal(t, "int", MustType(s, k))
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		Set(s, testKey(t), 1)
+		assert.Equal(t, "", MustType(s, -1))
+	})
+}
+
+func TestStore_MustType(t *testing.T) {
+	s := &Store[int]{}
+
+	t.Run("found", func(t *testing.T) {
+		k := testKey(t)
+		s.Set(k, 1)
+		assert.Equal(t, "int", s.MustType(k))
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		s.Set(testKey(t), 1)
+		assert.Equal(t, "", s.MustType(-1))
 	})
 }
 

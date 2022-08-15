@@ -52,6 +52,18 @@ func (s *Store[K]) Get(key K) (any, bool) {
 	return rawValue, true
 }
 
+// MustGet returns a value stored in the store if it exists, or zero value for the type
+func MustGet[V any, K comparable](store *Store[K], key K) V {
+	value, _ := Get[V](store, key)
+	return value
+}
+
+// MustGet returns raw value stored in the store if it exists, or nil
+func (s *Store[K]) MustGet(key K) any {
+	value, _ := s.Get(key)
+	return value
+}
+
 // Set stores value with the specified type in the store
 func Set[V any, K comparable](store *Store[K], key K, value V) {
 	store.lock.Lock()
@@ -80,12 +92,12 @@ func (s *Store[K]) Set(key K, value any) {
 	s.data[key] = value
 }
 
-// Type returns type name of value that is stored, if not found returns false and empty string
+// Type returns type name of value that is stored, if not found returns empty string and false
 func Type[K comparable](store *Store[K], key K) (string, bool) {
 	return store.Type(key)
 }
 
-// Type returns type name of value that is stored, if not found returns false and empty string
+// Type returns type name of value that is stored, if not found returns empty string and false
 func (s *Store[K]) Type(key K) (string, bool) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
@@ -96,6 +108,18 @@ func (s *Store[K]) Type(key K) (string, bool) {
 	}
 
 	return fmt.Sprintf("%T", data), true
+}
+
+// MustType returns type name of value that is stored, if not found returns an empty string
+func MustType[K comparable](store *Store[K], key K) string {
+	typ, _ := Type(store, key)
+	return typ
+}
+
+// MustType returns type name of value that is stored, if not found returns an empty string
+func (s *Store[K]) MustType(key K) string {
+	typ, _ := s.Type(key)
+	return typ
 }
 
 // Has returns true if value with the specified key and type exist in the store
