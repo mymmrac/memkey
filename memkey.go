@@ -3,7 +3,10 @@ Package memkey provides very simple type-safe, thread-safe in memory key-value s
 */
 package memkey
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 // Store represents key-value storage that is type-safe and thread-safe to use
 type Store[K comparable] struct {
@@ -75,6 +78,24 @@ func (s *Store[K]) Set(key K, value any) {
 	})
 
 	s.data[key] = value
+}
+
+// Type returns type name of value that is stored, if not found returns false and empty string
+func Type[K comparable](store *Store[K], key K) (string, bool) {
+	return store.Type(key)
+}
+
+// Type returns type name of value that is stored, if not found returns false and empty string
+func (s *Store[K]) Type(key K) (string, bool) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	data, ok := s.data[key]
+	if !ok {
+		return "", false
+	}
+
+	return fmt.Sprintf("%T", data), true
 }
 
 // Has returns true if value with the specified key and type exist in the store

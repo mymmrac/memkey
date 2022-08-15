@@ -112,6 +112,44 @@ func TestStore_GetAndSet(t *testing.T) {
 	})
 }
 
+func TestType(t *testing.T) {
+	s := &Store[int]{}
+
+	t.Run("found", func(t *testing.T) {
+		k := testKey(t)
+		Set(s, k, 1)
+		kind, ok := Type(s, k)
+		assert.True(t, ok)
+		assert.Equal(t, "int", kind)
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		Set(s, testKey(t), 1)
+		kind, ok := Type(s, -1)
+		assert.False(t, ok)
+		assert.Equal(t, "", kind)
+	})
+}
+
+func TestStore_Type(t *testing.T) {
+	s := &Store[int]{}
+
+	t.Run("found", func(t *testing.T) {
+		k := testKey(t)
+		Set(s, k, 1)
+		kind, ok := s.Type(k)
+		assert.True(t, ok)
+		assert.Equal(t, "int", kind)
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		Set(s, testKey(t), 1)
+		kind, ok := s.Type(-1)
+		assert.False(t, ok)
+		assert.Equal(t, "", kind)
+	})
+}
+
 func TestHas(t *testing.T) {
 	s := &Store[int]{}
 
