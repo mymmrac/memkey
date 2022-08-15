@@ -148,52 +148,27 @@ func TestHasRaw(t *testing.T) {
 	})
 }
 
-func TestDelete(t *testing.T) {
-	s := &Store[int]{}
-
-	t.Run("found", func(t *testing.T) {
-		k := testKey(t)
-		Set(s, k, 1)
-		Delete[int](s, k)
-		assert.False(t, Has[int](s, k))
-	})
-
-	t.Run("not_found_by_type", func(t *testing.T) {
-		k := testKey(t)
-		Set(s, k, 1)
-		Delete[float64](s, k)
-		assert.True(t, Has[int](s, k))
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		k := testKey(t)
-		Set(s, k, 1)
-		Delete[float64](s, -1)
-		assert.True(t, Has[int](s, k))
-	})
-}
-
 func TestDeleteOk(t *testing.T) {
 	s := &Store[int]{}
 
 	t.Run("found", func(t *testing.T) {
 		k := testKey(t)
 		Set(s, k, 1)
-		assert.True(t, DeleteOk[int](s, k))
+		assert.True(t, Delete[int](s, k))
 		assert.False(t, Has[int](s, k))
 	})
 
 	t.Run("not_found_by_type", func(t *testing.T) {
 		k := testKey(t)
 		Set(s, k, 1)
-		assert.False(t, DeleteOk[float64](s, k))
+		assert.False(t, Delete[float64](s, k))
 		assert.True(t, Has[int](s, k))
 	})
 
 	t.Run("not_found", func(t *testing.T) {
 		k := testKey(t)
 		Set(s, k, 1)
-		assert.False(t, DeleteOk[float64](s, -1))
+		assert.False(t, Delete[float64](s, -1))
 		assert.True(t, Has[int](s, k))
 	})
 }
@@ -204,32 +179,14 @@ func TestDeleteRaw(t *testing.T) {
 	t.Run("found", func(t *testing.T) {
 		k := testKey(t)
 		Set(s, k, 1)
-		DeleteRaw(s, k)
+		assert.True(t, DeleteRaw(s, k))
 		assert.False(t, HasRaw(s, k))
 	})
 
 	t.Run("not_found", func(t *testing.T) {
 		k := testKey(t)
 		Set(s, k, 1)
-		DeleteRaw(s, -1)
-		assert.True(t, HasRaw(s, k))
-	})
-}
-
-func TestDeleteRawOk(t *testing.T) {
-	s := &Store[int]{}
-
-	t.Run("found", func(t *testing.T) {
-		k := testKey(t)
-		Set(s, k, 1)
-		assert.True(t, DeleteRawOk(s, k))
-		assert.False(t, HasRaw(s, k))
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		k := testKey(t)
-		Set(s, k, 1)
-		assert.False(t, DeleteRawOk(s, -1))
+		assert.False(t, DeleteRaw(s, -1))
 		assert.True(t, HasRaw(s, k))
 	})
 }

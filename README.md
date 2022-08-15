@@ -35,18 +35,17 @@ s := &memkey.Store[comparable]{}
 All methods are type-safe and thread-safe, there are also type-unsafe variant of all methods (like `GetRaw`, `KeysRaw`,
 etc.).
 
-| Method                                                              | Description                             |
-|---------------------------------------------------------------------|-----------------------------------------|
-| [`Get`](https://pkg.go.dev/github.com/mymmrac/memkey#Get)           | Get value                               |
-| [`Set`](https://pkg.go.dev/github.com/mymmrac/memkey#Set)           | Set value                               |
-| [`Has`](https://pkg.go.dev/github.com/mymmrac/memkey#Has)           | Check if value exists                   |
-| [`Delete`](https://pkg.go.dev/github.com/mymmrac/memkey#Delete)     | Delete value                            |
-| [`DeleteOk`](https://pkg.go.dev/github.com/mymmrac/memkey#DeleteOk) | Delete value and return true if deleted |
-| [`Len`](https://pkg.go.dev/github.com/mymmrac/memkey#Len)           | Number of elements stored               |
-| [`Keys`](https://pkg.go.dev/github.com/mymmrac/memkey#Keys)         | Get keys                                |
-| [`Values`](https://pkg.go.dev/github.com/mymmrac/memkey#Values)     | Get values                              |
-| [`Entries`](https://pkg.go.dev/github.com/mymmrac/memkey#Entries)   | Get all key-value pairs                 |
-| [`ForEach`](https://pkg.go.dev/github.com/mymmrac/memkey#ForEach)   | Iterate over key-value pairs            |
+| Method                                                            | Description                             |
+|-------------------------------------------------------------------|-----------------------------------------|
+| [`Get`](https://pkg.go.dev/github.com/mymmrac/memkey#Get)         | Get value                               |
+| [`Set`](https://pkg.go.dev/github.com/mymmrac/memkey#Set)         | Set value                               |
+| [`Has`](https://pkg.go.dev/github.com/mymmrac/memkey#Has)         | Check if value exists                   |
+| [`Delete`](https://pkg.go.dev/github.com/mymmrac/memkey#Delete)   | Delete value and return true if deleted |
+| [`Len`](https://pkg.go.dev/github.com/mymmrac/memkey#Len)         | Number of elements stored               |
+| [`Keys`](https://pkg.go.dev/github.com/mymmrac/memkey#Keys)       | Get keys                                |
+| [`Values`](https://pkg.go.dev/github.com/mymmrac/memkey#Values)   | Get values                              |
+| [`Entries`](https://pkg.go.dev/github.com/mymmrac/memkey#Entries) | Get all key-value pairs                 |
+| [`ForEach`](https://pkg.go.dev/github.com/mymmrac/memkey#ForEach) | Iterate over key-value pairs            |
 
 ## :jigsaw: Usage
 

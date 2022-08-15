@@ -86,34 +86,8 @@ func HasRaw[K comparable](store *Store[K], key K) bool {
 	return ok
 }
 
-// Delete deletes value from the store if it exists with a specified type, if not found this is no-op
-func Delete[V any, K comparable](store *Store[K], key K) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
-
-	data, ok := store.data[key]
-	if !ok {
-		return
-	}
-
-	_, ok = data.(V)
-	if !ok {
-		return
-	}
-
-	delete(store.data, key)
-}
-
-// DeleteRaw deletes value from the store, if not found this is no-op
-func DeleteRaw[K comparable](store *Store[K], key K) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
-
-	delete(store.data, key)
-}
-
-// DeleteOk deletes value from the store if it exists with a specified type and returns true, if not found returns false
-func DeleteOk[V any, K comparable](store *Store[K], key K) bool {
+// Delete deletes value from the store if it exists with a specified type and returns true, if not found returns false
+func Delete[V any, K comparable](store *Store[K], key K) bool {
 	store.lock.Lock()
 	defer store.lock.Unlock()
 
@@ -131,8 +105,8 @@ func DeleteOk[V any, K comparable](store *Store[K], key K) bool {
 	return true
 }
 
-// DeleteRawOk deletes value from the store and returns true or if not found reruns false
-func DeleteRawOk[K comparable](store *Store[K], key K) bool {
+// DeleteRaw deletes value from the store and returns true or if not found reruns false
+func DeleteRaw[K comparable](store *Store[K], key K) bool {
 	store.lock.Lock()
 	defer store.lock.Unlock()
 
