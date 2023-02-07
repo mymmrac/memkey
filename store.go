@@ -1,5 +1,5 @@
 /*
-Package memkey provides very simple type-safe, thread-safe in memory key-value store with zero dependencies.
+Package memkey provides basic type-safe, thread-safe in memory key-value store with zero dependencies.
 */
 package memkey
 
@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-// Store represents key-value storage that is type-safe and thread-safe to use
+// Store represents key-value storage with defined keys that is type-safe and thread-safe to use
 type Store[K comparable] struct {
 	data map[K]any
 	init sync.Once
@@ -203,7 +203,7 @@ func (s *Store[K]) Len() int {
 	return len(s.data)
 }
 
-// Keys returns keys of all values with a specified type that are stored
+// Keys returns keys of all values with a specified type that are stored, no order is expected
 func Keys[V any, K comparable](store *Store[K]) []K {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
@@ -220,7 +220,7 @@ func Keys[V any, K comparable](store *Store[K]) []K {
 	return keys
 }
 
-// Keys returns keys of all values that are stored
+// Keys returns keys of all values that are stored, no order is expected
 func (s *Store[K]) Keys() []K {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
@@ -233,7 +233,7 @@ func (s *Store[K]) Keys() []K {
 	return keys
 }
 
-// Values returns all values with a specified type that are stored
+// Values returns all values with a specified type that are stored, no order is expected
 func Values[V any, K comparable](store *Store[K]) []V {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
@@ -248,7 +248,7 @@ func Values[V any, K comparable](store *Store[K]) []V {
 	return values
 }
 
-// Values returns all values that are stored
+// Values returns all values that are stored, no order is expected
 func (s *Store[K]) Values() []any {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
@@ -307,8 +307,10 @@ func ForEach[V any, K comparable](store *Store[K], f func(key K, value V)) {
 
 // ForEach goes in loop through all values and calls f with a key and value
 // Warning: May be not thread-safe depending on your usage
-func (s *Store[K]) ForEach(f func(key K, value any)) {
+func (s *Store[K]) ForEach(f func(key K, value any) (stop bool)) {
 	for key, rawValue := range s.data {
-		f(key, rawValue)
+		if f(key, rawValue) {
+			return
+		}
 	}
 }

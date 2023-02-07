@@ -405,8 +405,9 @@ func TestStore_ForEach(t *testing.T) {
 
 	Set(s, testKey(t), 1)
 	Set(s, testKey(t), 2.0)
-	s.ForEach(func(_ int, _ any) {
+	s.ForEach(func(_ int, _ any) bool {
 		count++
+		return false
 	})
 	assert.Equal(t, 2, count)
 }
