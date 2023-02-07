@@ -38,7 +38,7 @@ func (s *TypedStore[K, V]) Set(key K, value V) {
 	s.data[key] = value
 }
 
-// SetWithTTL stores value in the store with TTL
+// SetWithTTL stores value in the store with TTL, expiration happens only if ExpireTTL was called
 func (s *TypedStore[K, V]) SetWithTTL(key K, value V, ttl time.Duration) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -59,6 +59,7 @@ func (s *TypedStore[K, V]) SetWithTTL(key K, value V, ttl time.Duration) {
 	s.ttl[key] = time.Now().Add(ttl)
 }
 
+// ExpireTTL run check for TTL in specified time, and if expired func not nil it will be called with removed item
 func (s *TypedStore[K, V]) ExpireTTL(check time.Duration, expired func(key K, value V)) {
 	s.initTTL.Do(func() {
 		if s.ttl == nil {
