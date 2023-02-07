@@ -1,12 +1,18 @@
 package memkey
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 // TypedStore represents key-value storage with defined keys and values that is type-safe and thread-safe to use
 type TypedStore[K comparable, V any] struct {
 	data map[K]V
 	init sync.Once
 	lock sync.RWMutex
+
+	initTTL sync.Once
+	ttl     map[K]time.Time
 }
 
 // Get return value stored in the store if it exists, or zero value and false
@@ -30,6 +36,52 @@ func (s *TypedStore[K, V]) Set(key K, value V) {
 	})
 
 	s.data[key] = value
+}
+
+// SetWithTTL stores value in the store with TTL
+func (s *TypedStore[K, V]) SetWithTTL(key K, value V, ttl time.Duration) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.init.Do(func() {
+		if s.data == nil {
+			s.data = make(map[K]V)
+		}
+	})
+
+	s.initTTL.Do(func() {
+		if s.ttl == nil {
+			s.ttl = make(map[K]time.Time)
+		}
+	})
+
+	s.data[key] = value
+	s.ttl[key] = time.Now().Add(ttl)
+}
+
+func (s *TypedStore[K, V]) ExpireTTL(check time.Duration, expired func(key K, value V)) {
+	s.initTTL.Do(func() {
+		if s.ttl == nil {
+			s.ttl = make(map[K]time.Time)
+		}
+	})
+
+	for now := range time.Tick(check) {
+		s.lock.Lock()
+
+		for k, v := range s.ttl {
+			if v.Before(now) {
+				if expired != nil {
+					expired(k, s.data[k])
+				}
+
+				delete(s.data, k)
+				delete(s.ttl, k)
+			}
+		}
+
+		s.lock.Unlock()
+	}
 }
 
 // Has returns a true if value with the specified key exists in the store
